@@ -2,7 +2,7 @@
 
 **A quiet, private space to name what you feel, write it out, and let it move through you.**
 
-🔗 **Live site:**https://ayushi226-del.github.io/Tide_Write/
+🔗 **Live site:**
 
 ---
 
