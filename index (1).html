@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Tidewrite</title>
+<style>
+:root{--deep-blue:#2A4D88;--concerto:#D9D9D8;--glacial:#B1BBC8;--ocean-city:#7C94B8;
+--deep-blue-dark:color-mix(in srgb,#2A4D88 65%,#000);--concerto-soft:color-mix(in srgb,#D9D9D8 80%,transparent);
+--ink2:color-mix(in srgb,#2A4D88 80%,transparent);--lbl:color-mix(in srgb,#2A4D88 55%,#7C94B8);
+--serif:Georgia,"Iowan Old Style",serif;--sans:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;box-sizing:border-box}
+*,*::before,*::after{box-sizing:inherit}
+html{margin:0;overflow-y:auto;scrollbar-width:none;-ms-overflow-style:none}body{margin:0}html::-webkit-scrollbar,body::-webkit-scrollbar,textarea::-webkit-scrollbar{display:none;width:0;height:0}
+body{font:17px/1.75 var(--sans);color:var(--deep-blue);background:var(--deep-blue-dark);
+padding:env(safe-area-inset-top,0) env(safe-area-inset-right,0) env(safe-area-inset-bottom,0) env(safe-area-inset-left,0)}
+.bg{position:fixed;inset:0;background:linear-gradient(180deg,var(--deep-blue-dark) 0%,var(--deep-blue) 55%,var(--ocean-city) 100%)}
+.wl{position:absolute;inset:0;overflow:hidden}
+.wl svg{position:absolute;left:0;top:0;width:200%;height:100%;fill:none;stroke:var(--glacial);stroke-width:1;animation:slide 40s linear infinite}
+.wl svg:nth-child(2){opacity:.10;animation-duration:60s;stroke:#fff}
+.wl svg:nth-child(1){opacity:.06;animation-duration:90s;stroke:#fff}
+.wl svg:nth-child(3){opacity:.14;animation-duration:40s}
+@keyframes slide{to{transform:translateX(-50%)}}
+.grain{position:absolute;inset:0;width:100%;height:100%;opacity:.05;pointer-events:none}
+.glow{position:fixed;left:50%;top:50%;width:min(760px,120vw);height:min(760px,120vw);transform:translate(-50%,-50%);border-radius:50%;background:var(--glacial);opacity:.15;filter:blur(70px);pointer-events:none}
+.stage{position:relative;min-height:100dvh;display:flex;flex-direction:column}
+main{flex:1;min-height:0;display:flex;align-items:center;justify-content:center;padding:10px 12px}
+.card{position:relative;width:100%;max-width:560px;display:flex;flex-direction:column;background:color-mix(in srgb,var(--concerto) 88%,transparent);
+-webkit-backdrop-filter:blur(18px);backdrop-filter:blur(18px);border-radius:24px;border:1px solid color-mix(in srgb,var(--glacial) 60%,transparent);
+box-shadow:0 30px 80px -10px color-mix(in srgb,var(--deep-blue-dark) 35%,transparent),inset 0 1px 0 rgba(255,255,255,.4)}
+.prog{padding:14px 24px 0;font-size:12px;color:var(--ink2);display:flex;justify-content:space-between;align-items:center;gap:12px}
+.prog svg{width:100%;height:12px;display:block}
+.inner{padding:8px 24px 22px;flex:1}
+@media(min-width:640px){.inner{padding:12px 40px 36px}.prog{padding:20px 40px 0}}
+.step{opacity:0;transform:translateY(10px);filter:blur(4px);transition:opacity .5s,transform .5s,filter .5s}
+.step.in{opacity:1;transform:none;filter:none}
+.lbl{font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--lbl);margin:4px 0 2px;display:flex;align-items:center;gap:8px}
+.lbl::before{content:"";width:18px;height:6px;background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 18 6'%3E%3Cpath d='M0 3Q2.25 0 4.5 3T9 3T13.5 3T18 3' fill='none' stroke='%237C94B8' stroke-width='1.4'/%3E%3C/svg%3E")}
+h1,h2{font:400 clamp(26px,6vw,34px)/1.2 var(--serif);letter-spacing:-.01em;margin:.2em 0 .1em}
+.wv{display:block;width:100%;height:10px;margin:2px 0 10px}
+p{margin:0 0 .7em}.sec{color:var(--ink2)}
+.back{font:500 14px var(--sans);color:var(--deep-blue);background:color-mix(in srgb,var(--glacial) 22%,transparent);border:1px solid var(--glacial);border-radius:999px;padding:8px 18px;min-height:38px;cursor:pointer;margin:8px 0 4px}.back:hover{background:color-mix(in srgb,var(--glacial) 45%,transparent)}
+a,button,input,textarea{font-family:inherit}
+.link{font:500 15px/1.3 var(--sans);color:var(--deep-blue);background:color-mix(in srgb,var(--glacial) 22%,transparent);border:1px solid var(--glacial);border-radius:999px;padding:10px 20px;min-height:42px;cursor:pointer;box-shadow:inset 0 1px 0 rgba(255,255,255,.35);transition:background .2s,transform .2s}.link:hover{background:color-mix(in srgb,var(--glacial) 45%,transparent);transform:translateY(-1px)}.link:active{transform:translateY(1px)}
+:focus-visible{outline:2px solid var(--deep-blue);outline-offset:3px;border-radius:10px}
+.btn{font:500 16px var(--sans);padding:14px 28px;border-radius:999px;border:1px solid var(--deep-blue);background:var(--deep-blue);color:var(--concerto);cursor:pointer;box-shadow:inset 0 1px 0 rgba(255,255,255,.25);transition:transform .2s,box-shadow .2s,opacity .2s}
+.btn:hover:not(:disabled){transform:translateY(-2px);box-shadow:inset 0 1px 0 rgba(255,255,255,.25),0 8px 22px color-mix(in srgb,var(--ocean-city) 60%,transparent)}
+.btn:active:not(:disabled){transform:translateY(1px)}
+.btn:disabled{opacity:.45;cursor:not-allowed}
+.btn.ghost{background:transparent;color:var(--deep-blue);border-color:var(--glacial);box-shadow:none}
+.row{display:flex;flex-wrap:wrap;gap:10px 18px;align-items:center;margin-top:14px}
+.in-f,textarea{width:100%;font-size:16px;color:var(--deep-blue);background:var(--concerto-soft);border:1px solid var(--glacial);border-radius:14px;padding:14px 16px;box-shadow:inset 0 2px 5px color-mix(in srgb,var(--deep-blue) 12%,transparent);transition:border-color .2s,box-shadow .2s}
+.in-f:focus,textarea:focus{outline:none;border-color:var(--ocean-city);box-shadow:inset 0 2px 5px color-mix(in srgb,var(--deep-blue) 12%,transparent),0 0 0 4px color-mix(in srgb,var(--ocean-city) 25%,transparent)}
+::placeholder{color:color-mix(in srgb,var(--deep-blue) 60%,transparent);opacity:1}
+textarea{min-height:140px;max-height:240px;resize:none;overflow-y:auto;scrollbar-width:none;line-height:28px;background-image:repeating-linear-gradient(transparent 0 27px,color-mix(in srgb,var(--glacial) 55%,transparent) 27px 28px);background-attachment:local}
+.num{display:flex;gap:12px;align-items:center;margin-bottom:10px}
+.num i{flex:none;width:28px;height:28px;border-radius:50%;background:var(--ocean-city);color:var(--deep-blue-dark);font:600 14px/28px var(--sans);text-align:center;font-style:normal}
+.chips{display:flex;flex-wrap:wrap;gap:8px;margin:10px 0}
+.chip{display:inline-flex;align-items:center;font-size:15px;color:var(--deep-blue);background:transparent;border:1px solid var(--glacial);border-radius:999px;padding:6px 14px;min-height:40px;cursor:pointer;transition:background .2s}
+.chip:hover{background:color-mix(in srgb,var(--glacial) 30%,transparent)}
+.chip[aria-pressed="true"]{background:var(--ocean-city)}
+.chip::before{content:"\2713";display:inline-block;width:0;overflow:hidden;transform:scale(0);transition:transform .25s,width .25s,margin .25s}
+.chip[aria-pressed="true"]::before{width:1em;margin-right:6px;transform:scale(1)}
+.ib{margin-left:4px;width:26px;height:26px;border-radius:50%;border:1px solid var(--glacial);background:none;color:var(--deep-blue);font:italic 13px var(--serif);cursor:pointer}
+.tint,.why{background:color-mix(in srgb,var(--glacial) 25%,transparent);border-radius:12px;padding:12px 16px;font:italic 14px/1.6 var(--serif);color:color-mix(in srgb,var(--deep-blue) 85%,transparent)}
+.whyw{display:grid;grid-template-rows:0fr;transition:grid-template-rows .35s}.whyw.open{grid-template-rows:1fr;margin-top:6px}.whyw>div{overflow:hidden}
+.tags{display:flex;flex-wrap:wrap;gap:8px;margin:10px 0}.tags span{font-size:13px;border:1px solid var(--glacial);border-radius:999px;padding:2px 12px}
+.lv{display:block;width:100%;text-align:left;margin:0 0 8px;padding:10px 20px;border-radius:999px;border:1px solid var(--glacial);background:transparent;color:var(--deep-blue);font-size:16px;line-height:1.4;cursor:pointer;transition:background .2s}
+.lv:hover{background:color-mix(in srgb,var(--glacial) 30%,transparent)}.lv[aria-pressed="true"]{background:var(--ocean-city)}.lv b{font-weight:600}
+.big{font:400 30px var(--serif);text-align:center;padding:12px}
+.fw{font:400 44px/1.15 var(--serif);text-align:center;margin:8px 0}
+.orb{position:relative;width:170px;height:170px;margin:6px auto}
+.orb i,.orb b{position:absolute;inset:0;border-radius:50%}
+.orb b{background:radial-gradient(circle at 35% 30%,var(--glacial),var(--ocean-city) 60%,var(--deep-blue));animation:br 10s ease-in-out 3 both}
+.orb i{border:1.5px solid var(--ocean-city);animation:br 10s ease-in-out 3 both}.orb i+i{animation-delay:.5s;opacity:.6}
+@keyframes br{0%,100%{transform:scale(.55)}40%{transform:scale(1)}}
+.ringsvg{position:absolute;inset:0;width:100%;height:100%;pointer-events:none}
+.ringsvg rect{fill:none;stroke:var(--ocean-city);stroke-width:2;rx:24;ry:24;stroke-dasharray:1;stroke-dashoffset:1;transition:stroke-dashoffset 300s linear;vector-effect:non-scaling-stroke}
+.ringsvg.go rect{stroke-dashoffset:0}
+.sea{position:relative;height:150px;overflow:hidden;border-radius:16px;margin:8px 0}
+.sea .rise{position:absolute;inset:0;animation:rs 20s ease-in-out both}
+@keyframes rs{0%{transform:translateY(80%)}50%{transform:translateY(8%)}100%{transform:translateY(80%)}}
+.sea svg{position:absolute;left:0;bottom:0;width:200%;height:100%;fill:color-mix(in srgb,var(--ocean-city) 35%,transparent);stroke:var(--deep-blue);stroke-width:1.5;animation:slide 12s linear infinite;filter:drop-shadow(0 -2px 8px var(--glacial))}
+.sea svg+svg{animation-duration:20s;opacity:.5;stroke:var(--ocean-city)}
+.lines p{font:22px/1.4 var(--serif);opacity:0;transition:opacity .8s;margin:0 0 .4em}.lines p.in{opacity:1}
+.fade{opacity:0;transition:opacity .8s}.fade.in{opacity:1}
+.quote{font:italic 18px/1.6 var(--serif);border-left:2px solid var(--ocean-city);padding-left:14px;margin:10px 0}
+.entry{border:1px solid var(--glacial);border-radius:14px;padding:10px 16px;margin-bottom:8px}
+.entry summary{cursor:pointer}
+.top{display:flex;justify-content:space-between;gap:10px;padding:10px 14px 0}
+.pill{font:500 14px/1.2 var(--sans);color:var(--concerto);background:color-mix(in srgb,var(--concerto) 14%,transparent);border:1px solid color-mix(in srgb,var(--glacial) 55%,transparent);border-radius:999px;padding:10px 16px;min-height:40px;cursor:pointer;-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px);transition:background .2s}
+.pill:hover{background:color-mix(in srgb,var(--concerto) 26%,transparent)}
+.pill:focus-visible{outline-color:var(--concerto)}
+footer{text-align:center;padding:4px 16px 12px;font-size:13px;line-height:1.4;color:var(--concerto)}
+.acts{display:grid;gap:14px}.act{display:flex;flex-direction:column;align-items:center;gap:4px;text-align:center}.act .btn{width:100%}.act span{font-size:13px}
+.sr{position:absolute;left:-9999px}
+@media(max-height:700px){body{font-size:16px}.inner{padding-bottom:14px}.orb{width:130px;height:130px}.lv{padding:7px 18px}.big{font-size:26px}}
+@media(prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important}.orb b,.orb i{transform:scale(.8)}}
+</style></head>
+<body>
+<div class="bg" aria-hidden="true"><div class="wl" id="bgw"></div>
+<svg class="grain"><filter id="gr"><feTurbulence type="fractalNoise" baseFrequency=".8" numOctaves="2" stitchTiles="stitch"/></filter><rect width="100%" height="100%" filter="url(#gr)"/></svg></div>
+<div class="glow" aria-hidden="true"></div>
+<div class="stage"><header class="top"><button class="pill" id="sup" type="button">Need support right now?</button><button class="pill" id="clr" type="button">Clear everything</button></header><main aria-live="polite"><div class="card" id="card"></div></main>
+<footer>A reflective tool, not therapy or medical care.</footer></div>
+<script>
+/* ===== CONFIG: copy, lists, timings ===== */
+const CONFIG={
+phases:["Arrive","Name","Write","Surface","Carry"],
+order:["landing","breath","see","feel","hear","intensity","entry","expand","unpack1","free","unpack2","unpack3","wave","reflection","carry","goodbye"],
+phaseOf:{landing:0,breath:0,see:0,feel:0,hear:0,intensity:0,entry:1,expand:1,unpack1:2,free:2,unpack2:2,unpack3:2,wave:3,reflection:3,carry:4,goodbye:4},
+breath:{cycles:3,inMs:4000,outMs:6000},waveLines:[2000,7000,12000],waveBtn:21000,freeMs:300000,
+why:{breath:"Slow, longer exhales signal your body that it's safe to settle. You don't have to feel calm, just let the breath be slow.",
+see:"Naming what's around you pulls your attention out of the loop of thought and into the present moment.",
+feel:"Physical sensation is always in the present. Noticing it gives your attention somewhere steady to rest.",
+hear:"Listening widens your attention outward, which can loosen the grip of thoughts that circle.",
+intensity:"Describing how strong a feeling is, in words, is a small act of observing it rather than being inside it.",
+entry:"Putting a feeling into words, even rough ones, makes it easier for your mind to hold. This is called affect labeling.",
+expand:"A more precise word gives the feeling edges. People who can tell feelings apart tend to meet them with more steadiness.",
+u1:"Writing about an experience helps organize it into a story, with a beginning you can see.",
+u2:"Feelings often live in the body first. Noticing where gives you another way to describe what is happening.",
+u3:"Giving a feeling a voice puts a little distance between you and it, so you can listen instead of merge."},
+ground:{see:{h:"Name 3 things you can see.",ph:["The light on the wall...","A green plant...","My hands..."],w:"Naming what's around you pulls your attention out of the loop of thought and into the present moment."},
+feel:{h:"Name 3 things you can feel.",ph:["My feet on the floor...","The fabric of my clothes...","The weight of my body in the chair..."]},
+hear:{h:"Name 3 things you can hear.",ph:["A fan humming...","Distant traffic...","My own breathing..."]}},
+levels:[["Faint","it's there, but quiet"],["Present","I can feel it clearly"],["Strong","it's taking up space"],["Intense","it's hard to think around"],["Overwhelming","it fills everything"]],
+starts:["Tired","Stressed","Sad","Angry","Anxious","Numb"],
+groups:{
+bad:{keys:["bad","terrible","awful","off","not good"],words:["Frustrated","Rejected","Overwhelmed","Disappointed","Ashamed","Anxious","Exhausted","Lonely","Guilty","Powerless"]},
+upset:{keys:["upset","hurt"],words:["Hurt","Betrayed","Embarrassed","Resentful","Helpless","Misunderstood","Disrespected","Let down","Insecure","Unseen"]},
+sad:{keys:["sad","down","low","empty"],words:["Grieving","Lonely","Discouraged","Empty","Homesick","Heartbroken","Hopeless","Nostalgic","Defeated","Tender"]},
+mad:{keys:["mad","angry","annoyed"],words:["Irritated","Resentful","Indignant","Betrayed","Fed up","Jealous","Contemptuous","Provoked","Disrespected","Bitter"]},
+stress:{keys:["stressed","stress","anxious"],words:["Overloaded","Pressured","Uncertain","Behind","Trapped","Restless","Dread","Panicky","Worried","On edge"]},
+tired:{keys:["tired","numb"],words:["Drained","Burnt out","Disconnected","Flat","Detached","Apathetic","Depleted","Foggy"]},
+lost:{keys:["confused","lost","idk","don't know","weird","meh","fine","ok","okay"],words:["Unsure","Torn","Ambivalent","Disoriented","Restless","Unsettled","Distant","Stuck"]}},
+defs:{Frustrated:"Wanting something to move, and it won't.",Rejected:"Feeling pushed away or left out.",Overwhelmed:"More arriving than you can hold at once.",Disappointed:"Something you hoped for didn't arrive.",Ashamed:"Feeling that something about you is not acceptable.",Anxious:"The body bracing for something uncertain.",Exhausted:"Emptied out, with little left to give.",Lonely:"Wanting closeness that isn't there.",Guilty:"Feeling you did something that went against your values.",Powerless:"Wanting to change things and having no lever.",Hurt:"A sting from something that mattered.",Betrayed:"Trust that was broken.",Embarrassed:"Feeling exposed in front of others.",Resentful:"Anger that lingers because something felt unfair.",Helpless:"Wanting to act and not seeing how.",Misunderstood:"Not being seen the way you are.",Disrespected:"Feeling treated as though you matter less.","Let down":"Counting on something or someone that didn't hold.",Insecure:"Unsure of your footing or your worth.",Unseen:"Present, but not noticed.",Grieving:"Missing someone or something that is gone.",Discouraged:"Energy drained by effort that isn't landing.",Empty:"A sense of nothing there to feel.",Homesick:"Longing for a place or people that feel like home.",Heartbroken:"A deep ache after loss.",Hopeless:"Not seeing a way things could shift.",Nostalgic:"A tender pull toward the past.",Defeated:"Feeling that the effort lost.",Tender:"Soft and easily touched.",Irritated:"Small sparks adding up.",Indignant:"Anger at something that feels unjust.","Fed up":"Patience worn through.",Jealous:"Wanting what someone else has.",Contemptuous:"Looking down on something you can't respect.",Provoked:"Stirred up by something someone did.",Bitter:"Old hurt turned sharp.",Overloaded:"Too many demands at once.",Pressured:"Pushed to perform or decide.",Uncertain:"Not knowing what comes next.",Behind:"Feeling the pace has moved past you.",Trapped:"Seeing no way out.",Restless:"Unable to settle.",Dread:"Fear of something ahead.",Panicky:"A fast, sharp alarm in the body.",Worried:"The mind turning over what might go wrong.","On edge":"Ready to startle or snap.",Drained:"Energy running out of you.","Burnt out":"Worn down by carrying too much for too long.",Disconnected:"Cut off from people or from yourself.",Flat:"Little color or movement in feeling.",Detached:"Standing at a distance from what's happening.",Apathetic:"Unable to muster care.",Depleted:"Resources used up.",Foggy:"Thoughts slow and hard to see through.",Unsure:"Not knowing what you think.",Torn:"Pulled in two directions.",Ambivalent:"Holding two opposite feelings at once.",Disoriented:"Having lost your bearings.",Unsettled:"Something is off and hasn't named itself.",Distant:"Far from others, or from yourself.",Stuck:"Wanting to move and not moving."},
+unpack:[
+{k:"ctx",w:"u1",q:f=>`What happened just before ${f} showed up?`,s:"Notice the moment, the thought, or the message. It doesn't have to be dramatic.",st:["It started when...","I noticed it after...","Something about today..."]},
+{k:"body",w:"u2",q:f=>`Where do you feel ${f} in your body?`,s:"Feelings often have a physical shape: a size, a temperature, a weight.",st:["It feels like...","The heaviest part is..."],chips:["Tight chest","Heavy stomach","Hot face","Clenched jaw","Tense shoulders","Shaky hands","Lump in throat","Numbness","Restless legs"]},
+{k:"speak",w:"u3",q:f=>`If ${f} could speak, what would it say?`,s:"Let it talk without editing it. You're only listening.",st:["It wants me to know...","It's afraid that...","What it needs is..."]}],
+stop:"about after again also because been before being could does doing from have just like more much really should still than that them then there these they this very want what when where which while with would your into over some only other were i'm it's don't about".split(" "),
+shift:(a,b)=>`It has shifted from ${a} to ${b}.`,same:"It's still here, and so are you. That's okay."};
+const VAGUE=Object.values(CONFIG.groups).flatMap(g=>g.keys);
+const KEY="tidewrite.entries",card=document.querySelector("#card"),$=s=>card.querySelector(s)||document.querySelector(s);
+const esc=t=>String(t).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const fresh=()=>({g:{see:["","",""],feel:["","",""],hear:["","",""]},i0:-1,i1:-1,typed:"",group:"",sel:[],none:false,custom:"",feeling:"",ctx:"",body:"",speak:"",free:"",freeMode:false,carry:""});
+let S=fresh(),step="landing",hist=[],prevSup="landing",timers=[];
+const later=(f,ms)=>timers.push(setTimeout(f,ms)),stopT=()=>{timers.forEach(clearTimeout);timers=[]};
+const rm=()=>matchMedia("(prefers-reduced-motion: reduce)").matches;
+const load=()=>{try{return JSON.parse(localStorage.getItem(KEY)||"[]")}catch(e){return[]}};
+const save=a=>{try{localStorage.setItem(KEY,JSON.stringify(a));return true}catch(e){return false}};
+const cap=s=>s?s[0].toUpperCase()+s.slice(1):s;
+const WP=(y,amp,ph,per=1200,w=2400)=>{let d="";for(let x=0;x<=w;x+=30)d+=(x?"L":"M")+x+" "+(y+amp*Math.sin(2*Math.PI*x/per+ph)+amp*.4*Math.sin(4*Math.PI*x/per+ph*2)).toFixed(1)+" ";return d};
+$("#bgw").innerHTML=[0,1,2].map(l=>`<svg viewBox="0 0 2400 800" preserveAspectRatio="none">${Array.from({length:14},(_,i)=>`<path d="${WP(120+i*48+l*20,22+l*8,i*.35+l,1200/(l+1))}"/>`).join("")}</svg>`).join("");
+const sea=(h=70)=>`<div class="sea" style="height:${h}px;margin-top:0" aria-hidden="true"><svg viewBox="0 0 2400 100" preserveAspectRatio="none" style="animation-duration:16s"><path d="${WP(50,14,0,600,2400)}L2400 100L0 100Z"/></svg><svg viewBox="0 0 2400 100" preserveAspectRatio="none"><path d="${WP(60,10,2,800,2400)}L2400 100L0 100Z"/></svg></div>`;
+const sw=(c="wv")=>`<svg class="${c}" viewBox="0 0 200 10" preserveAspectRatio="none" aria-hidden="true"><path d="M0 5Q12.5 0 25 5T50 5T75 5T100 5T125 5T150 5T175 5T200 5" fill="none" stroke="#7C94B8" stroke-width="1.4" vector-effect="non-scaling-stroke"/></svg>`;
+const head=(lbl,h)=>`<div class="lbl">${lbl}</div><h2>${h}</h2>${sw()}`;
+const why=k=>`<button class="link" type="button" data-why aria-expanded="false">Why this helps</button><div class="whyw"><div><div class="why">${CONFIG.why[k]}</div></div></div>`;
+const fw=()=>S.feeling||S.typed||"this feeling";
+
+function go(n,back){
+  stopT();
+  if(!back&&n!==step&&step!=="support")hist.push(step);
+  const old=card.querySelector(".step"),run=()=>{step=n;render()};
+  if(old&&!rm()){old.classList.remove("in");setTimeout(run,380)}else run();
+}
+function render(){
+  const i=CONFIG.order.indexOf(step),p=CONFIG.phaseOf[step],showBack=hist.length&&["landing","wave","reflection","carry","goodbye","support"].indexOf(step)<0;
+  const wp="M0 6Q10 1 20 6T40 6T60 6T80 6T100 6T120 6T140 6T160 6T180 6T200 6";
+  const prog=step==="support"||step==="past"?"":`<div class="prog" aria-hidden="true"><svg viewBox="0 0 200 12" preserveAspectRatio="none"><path d="${wp}" fill="none" stroke="#B1BBC8" stroke-width="2" vector-effect="non-scaling-stroke"/><path d="${wp}" pathLength="1" fill="none" stroke="#7C94B8" stroke-width="2.4" stroke-dasharray="${(i/(CONFIG.order.length-1)).toFixed(3)} 1" vector-effect="non-scaling-stroke"/></svg><span style="white-space:nowrap">${CONFIG.phases[p]}</span></div>`;
+  card.innerHTML=`${step==="free"?'<svg class="ringsvg" aria-hidden="true"><rect id="rg" x="1" y="1" pathLength="1" style="width:calc(100% - 2px);height:calc(100% - 2px)"/></svg>':""}${prog}<div class="inner"><div class="step">${showBack?'<button class="back" id="bk" type="button">Back</button>':""}<div id="v"></div></div></div>`;
+  V[step]($("#v"));
+  if($("#bk"))$("#bk").onclick=()=>go(hist.pop(),true);
+  card.querySelectorAll("[data-why]").forEach(b=>b.onclick=()=>{const w=b.nextElementSibling,o=w.classList.toggle("open");b.setAttribute("aria-expanded",o)});
+  requestAnimationFrame(()=>requestAnimationFrame(()=>{card.querySelector(".step").classList.add("in");const f=card.querySelector("[autofocus]");if(f)f.focus({preventScroll:true})}));
+  window.scrollTo(0,0);
+}
+const nxt=(id,n)=>$(id).onclick=()=>go(n);
+const btn=(t,id,c="btn")=>`<button class="${c}" id="${id}" type="button">${t}</button>`;
+
+const V={
+/* ARRIVE */
+landing(e){e.innerHTML=`${sea()}
+${head("Arrive","You're here. That's enough for now.")}<p>Whatever brought you here, you don't have to explain it yet. This is a quiet place to slow down, find the right words for what you're feeling, and let it move through you at its own pace.</p><p>Nothing you write leaves this page unless you choose to keep it.</p>
+<div class="tags"><span>About 5-10 minutes</span><span>Nothing is saved</span><span>Skip anything</span></div>
+<div class="row">${btn("Ground me first","a")}<button class="link" id="b" type="button">I'm ready to write</button></div>${load().length?'<button class="link" id="pe" type="button">Past entries</button>':""}`;
+nxt("#a","breath");nxt("#b","intensity");if($("#pe"))nxt("#pe","past")},
+/* AROUND: grounding by slow breath (urge-surfing groundwork) */
+breath(e){const B=CONFIG.breath;e.innerHTML=`${head("Ground","Let the breath be slow.")}<div class="orb" aria-hidden="true"><i></i><i></i><b></b></div><p class="sec" style="text-align:center;font:22px var(--serif)" id="bt">Breathe in...</p>${why("breath")}<div class="row"><span class="fade" id="cw">${btn("Continue","c")}</span><button class="btn ghost" id="sk" type="button">Skip for now</button></div>`;
+const t=$("#bt");let k=0,inn=false;const tick=()=>{inn=!inn;t.textContent=inn?"Breathe out...":"Breathe in...";k++;if(k<B.cycles*2-1)later(tick,inn?B.outMs:B.inMs);else later(()=>{$("#cw").classList.add("in")},B.outMs)};
+t.textContent="Breathe in...";inn=false;later(()=>{t.textContent="Breathe out...";inn=true;later(tick,B.outMs)},B.inMs);k=1;
+if(rm())$("#cw").classList.add("in");$("#cw").querySelector("button").onclick=()=>go("see");nxt("#sk","intensity")},
+see:e=>G(e,"see","feel"),feel:e=>G(e,"feel","hear"),hear:e=>G(e,"hear","intensity"),
+/* ARRIVE: intensity in words */
+intensity(e){e.innerHTML=`${head("Arrive","How strong does it feel right now?")}${LV("i0")}${why("intensity")}<div class="row">${btn("Next","n")}<button class="btn ghost" id="sk" type="button">Skip for now</button></div>`;LVb(e,"i0");nxt("#n","entry");nxt("#sk","entry")},
+/* NAME: affect labeling */
+entry(e){e.innerHTML=`${head("Name it","What are you feeling right now?")}<p class="sec">One or two words is enough. It doesn't have to be exact yet.</p>
+<label class="sr" for="w">Your feeling in one or two words</label><input class="in-f big" id="w" maxlength="40" autocomplete="off" autofocus placeholder="e.g. heavy, restless, hurt..." value="${esc(S.typed)}">
+<div class="sec" style="font-size:14px;margin-top:8px">Need a starting point?</div><div class="chips">${CONFIG.starts.map(x=>`<button class="chip" type="button">${x}</button>`).join("")}</div>${why("entry")}<div class="row">${btn("Continue","c")}</div>`;
+const w=$("#w"),c=$("#c"),upd=()=>{S.typed=w.value.trim();c.disabled=S.typed.length<2};upd();w.oninput=upd;
+e.querySelectorAll(".chip").forEach(b=>b.onclick=()=>{w.value=b.textContent;upd();w.focus()});
+const sub=()=>{if(c.disabled)return;const low=S.typed.toLowerCase(),v=VAGUE.find(x=>low.includes(x));
+if(v){S.group=Object.keys(CONFIG.groups).find(k=>CONFIG.groups[k].keys.includes(v));S.sel=[];S.none=false;go("expand")}else{S.feeling=S.typed.toLowerCase();S.carry=cap(S.typed);go("unpack1")}};
+c.onclick=sub;w.onkeydown=ev=>{if(ev.key==="Enter")sub()}},
+expand(e){const g=CONFIG.groups[S.group];e.innerHTML=`${head("Name it",`Sometimes '${esc(S.typed)}' has more specific textures.`)}<p class="sec">Does any of this feel close? Choose up to three. You can also keep your own word.</p>
+<div class="chips">${g.words.map(x=>`<span><button class="chip" type="button" aria-pressed="${S.sel.includes(x)}">${x}</button><button class="ib" type="button" aria-label="What does ${x} mean?" data-d="${x}">i</button></span>`).join("")}<button class="chip" id="no" type="button" aria-pressed="${S.none}" style="width:100%">None of these. I'll keep my own word.</button></div>
+<div class="tint" id="df" aria-live="polite" style="min-height:3em"></div>
+<label for="cu" class="sec" style="display:block;margin:10px 0 4px">Or type a more exact word:</label><input class="in-f" id="cu" maxlength="40" autocomplete="off" value="${esc(S.custom)}">${why("expand")}<div class="row">${btn("Continue","c")}</div>`;
+const df=$("#df"),c=$("#c"),chips=[...e.querySelectorAll(".chip:not(#no)")],chk=()=>{c.disabled=!(S.sel.length||S.custom.trim()||S.none)};chk();
+chips.forEach(b=>b.onclick=()=>{const t=b.textContent,on=S.sel.includes(t);if(on)S.sel=S.sel.filter(x=>x!==t);else if(S.sel.length>=3){df.textContent="Three is plenty.";return}else{S.sel.push(t);S.none=false;$("#no").setAttribute("aria-pressed","false")}b.setAttribute("aria-pressed",!on);chk()});
+e.querySelectorAll(".ib").forEach(b=>b.onclick=()=>df.innerHTML=`<b>${b.dataset.d}</b>: ${CONFIG.defs[b.dataset.d]}`);
+$("#no").onclick=()=>{S.none=!S.none;if(S.none){S.sel=[];chips.forEach(b=>b.setAttribute("aria-pressed","false"))}$("#no").setAttribute("aria-pressed",S.none);chk()};
+$("#cu").oninput=ev=>{S.custom=ev.target.value;chk()};
+c.onclick=()=>{let l=[...S.sel,S.custom.trim()].filter(Boolean);if(!l.length)l=[S.typed];S.feeling=l.join(" and ").toLowerCase();S.carry=l[0];go("unpack1")}},
+unpack1:e=>U(e,0),unpack2:e=>U(e,1),unpack3:e=>U(e,2),
+free(e){e.innerHTML=`${head("Write","Write freely.")}<p class="sec">Take as long as you like. The ring only marks time softly. Finish whenever you're ready.</p><label class="sr" for="t">Free writing</label><textarea id="t" style="min-height:200px" autofocus>${esc(S.free)}</textarea><div class="row">${btn("Finish","n")}</div>`;
+const t=$("#t");t.oninput=()=>S.free=t.value;nxt("#n","wave");later(()=>$("#rg").parentNode.classList.add("go"),60);$("#rg").parentNode.querySelector("rect").style.transitionDuration=CONFIG.freeMs+"ms"},
+/* SURFACE: urge surfing */
+wave(e){const P=WP(40,18,0,600,2400)+"L2400 160L0 160Z";e.innerHTML=`${head("Surface","Let it move.")}<div class="sea" aria-hidden="true"><div class="rise"><svg viewBox="0 0 2400 160" preserveAspectRatio="none"><path d="${P}"/></svg><svg viewBox="0 0 2400 160" preserveAspectRatio="none"><path d="${WP(55,14,2,800,2400)}L2400 160L0 160Z"/></svg></div></div>
+<div class="lines">${["You noticed it.","You stayed with it.","It rose. You're still here."].map(x=>`<p>${x}</p>`).join("")}</div><div class="fade" id="cw">${btn("Continue","n")}</div>`;
+const ps=[...e.querySelectorAll(".lines p")];ps.forEach((p,i)=>later(()=>p.classList.add("in"),rm()?0:CONFIG.waveLines[i]));later(()=>$("#cw").classList.add("in"),rm()?500:CONFIG.waveBtn);nxt("#n","reflection")},
+reflection(e){const lines=[S.ctx,S.body,S.speak,S.free].join("\n").split(/\n+/).map(x=>x.trim()).filter(Boolean),q=lines.sort((a,b)=>b.length-a.length)[0];
+const draw=()=>{const L=CONFIG.levels,a=S.i0,b=S.i1;e.innerHTML=`${head("Surface","Look at what you did.")}<p>You began with '${esc(S.typed||"a feeling")}'. Now you can name it as '${esc(fw())}'.</p>${q?`<div class="sec" style="font-size:14px">In your own words:</div><div class="quote">${esc(q.slice(0,140))}</div>`:""}
+<h2 style="font-size:22px;margin-top:12px">How strong does it feel now?</h2>${LV("i1")}<p class="sec" id="sh" aria-live="polite">${a>=0&&b>=0?(a===b?CONFIG.same:CONFIG.shift(L[a][0].toLowerCase(),L[b][0].toLowerCase())):""}</p><p><i>Naming a feeling precisely gives you more choices about how to meet it.</i></p><div class="row">${btn("Continue","n")}</div>`;
+LVb(e,"i1",()=>{const L=CONFIG.levels,a=S.i0,b=S.i1;$("#sh").textContent=a>=0&&b>=0?(a===b?CONFIG.same:CONFIG.shift(L[a][0].toLowerCase(),L[b][0].toLowerCase())):""});nxt("#n","carry")};draw()},
+carry(e){const draw=()=>{const A=[["er","Erase everything","Clears everything and returns to the start."],["kp","Keep it on this device","Saved only in this browser. You can delete it any time."],["cl","Save nothing and close","Clears everything and says goodbye."]];
+e.innerHTML=`${sea()}${head("Carry","If you carry one thing with you, it can be this.")}<div class="fw" id="cw">${esc(cap(S.carry||"here"))}</div><div class="row" style="justify-content:center;margin-top:0"><button class="link" id="oth" type="button">Choose a different word</button></div><div class="chips" id="wl" hidden style="justify-content:center"></div>
+<p class="sec" style="text-align:center;margin:14px 0 12px">Nothing you wrote leaves this page unless you choose to keep it here.</p><div class="acts">${A.map(([id,t,d])=>`<div class="act">${btn(t,id)}<span class="sec">${d}</span></div>`).join("")}</div><p class="sec" id="ms" aria-live="polite" style="text-align:center;margin-top:10px"></p>`;
+$("#oth").onclick=()=>{const wl=$("#wl");if(!wl.hidden){wl.hidden=true;return}const ws=[...new Set(([S.ctx,S.body,S.speak,S.free].join(" ").toLowerCase().match(/[a-z'’-]{3,}/g)||[]).filter(w=>!CONFIG.stop.includes(w)))].slice(0,12);
+wl.innerHTML=ws.length?ws.map(w=>`<button class="chip" type="button">${esc(w)}</button>`).join(""):'<span class="sec">Nothing written yet to choose from.</span>';wl.hidden=false;wl.querySelectorAll(".chip").forEach(b=>b.onclick=()=>{S.carry=b.textContent;draw()})};
+$("#er").onclick=()=>{S=fresh();hist=[];go("landing")};$("#cl").onclick=()=>{S=fresh();hist=[];go("goodbye")};
+$("#kp").onclick=()=>{const L=CONFIG.levels,a=load();a.unshift({date:new Date().toISOString(),original:S.typed,feeling:fw(),start:S.i0>=0?L[S.i0][0]:"",end:S.i1>=0?L[S.i1][0]:"",carried:S.carry,writing:[...S.g.see,...S.g.feel,...S.g.hear,S.ctx,S.body,S.speak,S.free].filter(Boolean).join("\n")});
+const ok=save(a);$("#ms").innerHTML=ok?'Kept here, only on this device. <button class="link" id="pe" type="button">Past entries</button>':"This device did not allow saving. Nothing has been kept.";if(ok){$("#kp").disabled=true;nxt("#pe","past")}}};draw()},
+goodbye(e){e.innerHTML=`${sea()}${head("","Take what you need from this.")}<p>You can close this window, or begin again whenever you like.</p><div class="row">${btn("Begin again","b")}</div>`;$("#b").onclick=()=>{S=fresh();hist=[];go("landing")}},
+support(e){e.innerHTML=`<h2>Support</h2>${sw()}<p>If you are in immediate danger, contact your local emergency services. If you want to talk to someone, a trusted person or a local crisis line can help.</p><div class="row"><button class="link" id="b" type="button">Return</button></div>`;$("#b").onclick=()=>{hist.pop();go(prevSup,true)}},
+past(e){const a=load();e.innerHTML=`<h2>Past entries</h2>${sw()}${a.length?a.map((x,i)=>`<details class="entry"><summary>${new Date(x.date).toLocaleDateString()}: ${esc(x.feeling)}</summary><p class="sec" style="margin:6px 0">Began: ${esc(x.original)}. Carried: ${esc(x.carried)}.${x.start?` Intensity ${esc(x.start.toLowerCase())}${x.end?" to "+esc(x.end.toLowerCase()):""}.`:""}</p><p style="white-space:pre-wrap">${esc(x.writing)}</p><button class="link" data-i="${i}" type="button">Delete</button></details>`).join(""):'<p class="sec">Nothing kept here.</p>'}<div class="row"><button class="link" id="b" type="button">Return</button></div>`;
+e.querySelectorAll("[data-i]").forEach(b=>b.onclick=()=>{const a=load();a.splice(+b.dataset.i,1);save(a);go("past",true)});$("#b").onclick=()=>go("landing",true)}};
+/* grounding screens: mindful attention to the present (each with visible inputs) */
+function G(e,k,next){const C=CONFIG.ground[k],last=k==="hear",A=S.g[k];
+const row=i=>`<div class="num"><i>${i+1}</i><label class="sr" for="f${i}">${C.h} Number ${i+1}</label><input class="in-f" id="f${i}" autocomplete="off" placeholder="${C.ph[i]||"Something else..."}" value="${esc(A[i]||"")}" ${i?"":"autofocus"}></div>`;
+e.innerHTML=`${head("Ground",C.h)}<p class="sec">Take your time. Each one can be a word or a short phrase. Add as many as come to mind.</p><div id="rows">${A.map((_,i)=>row(i)).join("")}</div><div class="row" style="margin:0 0 6px"><button class="link" id="ad" type="button">Add another one</button></div>${why(k)}${last?'<p class="sec" style="margin-top:8px">Whenever you\'re ready.</p>':""}
+<div class="row">${btn(last?"I'm here":"Next","n")}<button class="btn ghost" id="sk" type="button">Skip for now</button></div>`;
+const bind=i=>{const x=$("#f"+i);x.oninput=()=>A[i]=x.value;x.onkeydown=ev=>{if(ev.key==="Enter"){ev.preventDefault();const n=$("#f"+(i+1));if(n)n.focus();else if(x.value.trim())add();else go(next)}}};
+const add=()=>{A.push("");$("#rows").insertAdjacentHTML("beforeend",row(A.length-1));bind(A.length-1);$("#f"+(A.length-1)).focus()};
+A.forEach((_,i)=>bind(i));$("#ad").onclick=add;nxt("#n",next);nxt("#sk","intensity")}
+function LV(key){return `<div role="group" aria-label="Intensity">${CONFIG.levels.map((l,i)=>`<button class="lv" type="button" data-l="${i}" aria-pressed="${S[key]===i}"><b>${l[0]}</b>: ${l[1]}</button>`).join("")}</div>`}
+function LVb(e,key,cb){e.querySelectorAll(".lv").forEach(b=>b.onclick=()=>{S[key]=+b.dataset.l;e.querySelectorAll(".lv").forEach(x=>x.setAttribute("aria-pressed",x===b));if(cb)cb()})}
+/* WRITE: expressive writing */
+function U(e,i){const C=CONFIG.unpack[i],f=fw(),n=["unpack1","unpack2","unpack3"][i+1]||"wave";
+e.innerHTML=`${head("Write",C.q(f))}<p class="sec">${C.s}</p>${i===0?'<p class="sec" style="font-size:15px">There\'s no right way to write this. It doesn\'t need to be polished.</p>':""}
+${C.chips?`<div class="chips" aria-label="Body sensations">${C.chips.map(x=>`<button class="chip" type="button" data-b="${x}">${x}</button>`).join("")}</div>`:""}
+<div class="chips">${C.st.map(x=>`<button class="chip" type="button" data-s="${x}">${x}</button>`).join("")}</div><label class="sr" for="t">${esc(C.q(f))}</label><textarea id="t" autofocus>${esc(S[C.k])}</textarea><div class="sec" id="wc" style="font-size:13px;text-align:right"></div>${why(C.w)}
+<div class="row">${btn("Next","n")}<button class="btn ghost" id="sk" type="button">Skip this one</button>${i===0?'<button class="link" id="fr" type="button">Prefer to write freely?</button>':""}</div>`;
+const t=$("#t"),upd=()=>{S[C.k]=t.value;const w=t.value.trim()?t.value.trim().split(/\s+/).length:0;$("#wc").textContent=w+(w===1?" word":" words")};upd();t.oninput=upd;
+const add=x=>{t.value+=(t.value&&!/\s$/.test(t.value)?" ":"")+x;upd();t.focus()};
+e.querySelectorAll("[data-s]").forEach(b=>b.onclick=()=>add(b.dataset.s));
+e.querySelectorAll("[data-b]").forEach(b=>b.onclick=()=>{const x=b.dataset.b;if(!t.value.toLowerCase().includes(x.toLowerCase()))add(x+".")});
+nxt("#n",n);nxt("#sk",n);if($("#fr"))$("#fr").onclick=()=>{S.freeMode=true;go("free")}}
+$("#clr").onclick=()=>{S=fresh();hist=[];go("landing")};
+$("#sup").onclick=()=>{if(step!=="support"){prevSup=step;go("support")}};
+render();
+</script></body></html>
